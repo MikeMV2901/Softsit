@@ -1,3 +1,5 @@
+import platform
+import psutil
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
@@ -96,6 +98,10 @@ def open_main_window(username):
 
     masajes_button = tk.Button(main_window, text="Ver Registros de Masajes", command=show_masajes)
     masajes_button.pack()
+
+    # Botón para abrir la ventana de información técnica
+    info_button = tk.Button(main_window, text="Información Técnica", command=open_info_window)
+    info_button.pack()
 
     main_window.mainloop()
 
@@ -245,6 +251,31 @@ def show_masajes():
     return_button = tk.Button(masajes_window, text="Regresar", command=masajes_window.destroy)
     return_button.pack()
 
+# Función para abrir la ventana de información técnica
+def open_info_window():
+    info_window = tk.Toplevel()
+    info_window.title("Información Técnica")
+    info_window.geometry("400x300")
+
+    # Obtener información del sistema operativo
+    processor = platform.processor()
+    platform_os = platform.system()
+    memory = psutil.virtual_memory().total / (1024 * 1024)  # Total de memoria en megabytes
+
+    # Crear etiquetas para mostrar la información del sistema
+    processor_label = tk.Label(info_window, text=f"Procesador: {processor}")
+    processor_label.pack()
+
+    os_label = tk.Label(info_window, text=f"Plataforma Operativa: {platform_os}")
+    os_label.pack()
+
+    memory_label = tk.Label(info_window, text=f"Cantidad de Memoria: {memory} MB")
+    memory_label.pack()
+
+    # Botón para cerrar la ventana de información técnica
+    close_button = tk.Button(info_window, text="Cerrar", command=info_window.destroy)
+    close_button.pack()
+
 # Crear la ventana principal de inicio de sesión
 window = tk.Tk()
 window.title("Sistema de Terapias y Masajes")
@@ -268,11 +299,3 @@ register_button = tk.Button(window, text="Registrar", command=open_register_wind
 register_button.pack()
 
 window.mainloop()
-
-
-
-
-
-
-
-
