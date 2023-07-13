@@ -14,6 +14,20 @@ def open_register_window():
         register_window.destroy()  # Cerrar la ventana de registro
         window.deiconify()  # Volver a mostrar la ventana principal
 
+    def register():
+        username = username_entry.get()
+        password = password_entry.get()
+        birthdate = birthdate_entry.get()
+        email = email_entry.get()
+
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO Usuarios (Usuario_Name, Usuario_Password, Fecha_Nacimiento, Correo) VALUES (?, ?, ?, ?)",
+                       (username, password, birthdate, email))
+        connection.commit()
+
+        messagebox.showinfo("Registro", "Registro exitoso")
+        close_register_window()  # Cerrar la ventana de registro y volver a la ventana principal
+
     register_window = tk.Toplevel()
     register_window.title("Registro")
     register_window.geometry("1600x900")
@@ -38,10 +52,12 @@ def open_register_window():
     email_entry = tk.Entry(register_window)
     email_entry.pack()
 
-    register_button = tk.Button(register_window, text="Registrar",
-                               command=lambda: register(register_window, username_entry.get(), password_entry.get(),
-                                                       birthdate_entry.get(), email_entry.get()))
+    register_button = tk.Button(register_window, text="Registrar", command=register)
     register_button.pack()
+
+    # Botón para regresar a la ventana de inicio de sesión
+    return_button = tk.Button(register_window, text="Regresar", command=close_register_window)
+    return_button.pack()
 
     register_window.protocol("WM_DELETE_WINDOW", close_register_window)  # Manejar el evento de cierre de la ventana
 
@@ -62,17 +78,6 @@ def login():
     else:
         # Credenciales inválidas
         messagebox.showerror("Inicio de sesión", "Credenciales inválidas")
-
-# Función para realizar el registro de usuario
-def register(window, username, password, birthdate, email):
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO Usuarios (Usuario_Name, Usuario_Password, Fecha_Nacimiento, Correo) VALUES (?, ?, ?, ?)",
-                   (username, password, birthdate, email))
-    connection.commit()
-
-    messagebox.showinfo("Registro", "Registro exitoso")
-    window.destroy()  # Cerrar la ventana de registro
-    window.deiconify()  # Volver a mostrar la ventana principal
 
 # Función para abrir la ventana principal
 def open_main_window(username):
@@ -263,6 +268,7 @@ register_button = tk.Button(window, text="Registrar", command=open_register_wind
 register_button.pack()
 
 window.mainloop()
+
 
 
 
