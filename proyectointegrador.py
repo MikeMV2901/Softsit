@@ -8,6 +8,9 @@ import pyodbc
 # Crear la conexión a la base de datos
 connection = pyodbc.connect('DRIVER={SQL Server};SERVER=localhost\\SQLEXPRESS;DATABASE=Softsit;Trusted_Connection=yes;')
 
+# Variable global para almacenar el ID del usuario actual
+current_user_id = None
+
 # Función para abrir la ventana de registro
 def open_register_window():
     window.withdraw()  # Ocultar la ventana principal
@@ -73,6 +76,8 @@ def login():
     user = cursor.fetchone()
 
     if user:
+        global current_user_id
+        current_user_id = user[0]  # Almacenar el ID del usuario actual
         # Iniciar sesión exitoso
         messagebox.showinfo("Inicio de sesión", "Inicio de sesión exitoso")
         window.withdraw()  # Ocultar la ventana de inicio de sesión
@@ -128,7 +133,7 @@ def show_terapias():
 
     # Consultar las terapias disponibles
     cursor = connection.cursor()
-    cursor.execute("SELECT * FROM Menu_Terapias WHERE Contractura_Rodilla=1 OR Contractura_Muneca=1 OR Contractura_Codo=1 OR Contractura_Talon=1 OR Contractura_Isquiotibiale=1")
+    cursor.execute("SELECT * FROM Menu_Terapias WHERE Contractura_rodilla=1 OR Contractura_muneca=1 OR Contractura_codo=1 OR Contractura_talon=1 OR Contractura_isquiotibiale=1")
     terapias = cursor.fetchall()
 
     # Crear etiquetas y mostrar los registros de terapias
@@ -136,6 +141,12 @@ def show_terapias():
     terapias_label.pack()
 
     for terapia in terapias:
+        def select_terapia(id):
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Usuario_Menu_Terapias (Fk_Usuario, Fk_Menu) VALUES (?, ?)", (current_user_id, id))
+            connection.commit()
+            messagebox.showinfo("Terapia seleccionada", f"Terapia ID: {id} seleccionada")
+
         terapia_label = tk.Label(frame, text=f"Terapia ID: {terapia[0]}", font=("Arial", 12))
         terapia_label.pack()
 
@@ -164,6 +175,9 @@ def show_terapias():
 
         separator = tk.Label(frame, text="------------------------------", font=("Arial", 12))
         separator.pack()
+
+        select_button = tk.Button(frame, text="Seleccionar", command=lambda id=terapia[0]: select_terapia(id))
+        select_button.pack()
 
     # Configurar el desplazamiento del marco y de la lona
     frame.bind("<Configure>", lambda event: canvas.configure(scrollregion=canvas.bbox("all")))
@@ -203,6 +217,12 @@ def show_masajes():
     masajes_label.pack()
 
     for masaje in masajes:
+        def select_masaje(id):
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO Usuario_Menu_Masajes (Fk_Usuario, Fk_Menu) VALUES (?, ?)", (current_user_id, id))
+            connection.commit()
+            messagebox.showinfo("Masaje seleccionado", f"Masaje ID: {id} seleccionado")
+
         masaje_label = tk.Label(frame, text=f"Masaje ID: {masaje[0]}", font=("Arial", 12))
         masaje_label.pack()
 
@@ -243,6 +263,9 @@ def show_masajes():
 
         separator = tk.Label(frame, text="------------------------------", font=("Arial", 12))
         separator.pack()
+
+        select_button = tk.Button(frame, text="Seleccionar", command=lambda id=masaje[0]: select_masaje(id))
+        select_button.pack()
 
     # Configurar el desplazamiento del marco y de la lona
     frame.bind("<Configure>", lambda event: canvas.configure(scrollregion=canvas.bbox("all")))
@@ -299,5 +322,3 @@ register_button = tk.Button(window, text="Registrar", command=open_register_wind
 register_button.pack()
 
 window.mainloop()
-
-# hola 123
